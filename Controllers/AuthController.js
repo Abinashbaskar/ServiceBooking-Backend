@@ -2,12 +2,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../Models/User.js";
 
-// Generate JWT token
 const generateToken = (userid, email) => {
   return jwt.sign({ userid, email }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
-// Generate custom User ID (U001, U002, ...)
 const generateUserId = async () => {
   const lastUser = await User.findOne({
     order: [["createdAt", "DESC"]],
@@ -25,9 +23,9 @@ const generateUserId = async () => {
 // Register User
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, phone, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !phone || !password) {
       return res.status(400).json({ message: "Required fields missing" });
     }
 
@@ -43,6 +41,7 @@ export const registerUser = async (req, res) => {
       userid,
       name,
       email,
+      phone,
       password: hashedPassword,
     });
 
@@ -85,7 +84,6 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// Protected Route Example
 export const getProfile = async (req, res) => {
   try {
     res.json({ message: "Profile data", user: req.user });
